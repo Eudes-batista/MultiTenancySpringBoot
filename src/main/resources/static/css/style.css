@@ -1,0 +1,22 @@
+body{
+    background: #f7f7f7;
+    text-transform: uppercase;
+}
+#toast-container {
+    top: 10% !important;
+    right: auto !important;
+    bottom: auto !important;
+    left:2%;  
+}
+.toast{
+    background: #ef9a9a;
+
+}
+@media(min-width:768px){
+    .jumbotron{
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 20px;
+        width: 500px;
+    }
+}

@@ -1,0 +1,82 @@
+<script>
+    $(document).ready(function () {
+        var tenancyID = localStorage.getItem("usuario");
+        M.AutoInit();
+        buscarProduto(tenancyID);
+        $('.moeda').mask('###.##0,00', {reverse: true});
+        $("#salvar").click(function () {
+            var referencia = $("#referencia").val();
+            var descricao = $("#descricao").val();
+            var preco = $("#preco").val();
+            var precoFormatado = preco.toString().replace(/\./, '').replace(/\,/, '.');
+            var product = {id: referencia, name: descricao, price: precoFormatado,currentInventory:0};
+            $.ajax({
+                url: "http://" + document.domain + ":8090/product",
+                type: 'POST',
+                contentType: "application/json",
+                dataType: 'json',
+                headers: {'X-TENANCY-ID': tenancyID},
+                data: JSON.stringify(product)
+            }).done(function (dados) {
+                if (dados) {
+                    M.toast({html: 'Produto salvo com sucesso.', classes: ['rounded', 'posicao']});
+                }
+            });
+        });
+        function buscarProduto(tenancyID) {
+            var id = localStorage.getItem("id");
+            $.ajax({
+                url: "http://localhost:8090/product/" + id,
+                type: 'GET',
+                dataType: 'json',
+                headers: {'X-TENANCY-ID': tenancyID}
+            }).done(function (dados) {
+                if (dados) {
+                    $("#referencia").val(dados.id);
+                    $("#descricao").val(dados.name);
+                    $("#preco").val(dados.price);
+                    localStorage.removeItem("id");
+                    return;
+                }
+                localStorage.removeItem("id");
+                irParaPagina('produtos');
+            });
+        }
+    });
+</script>
+<div class="row">
+    <div class="col s12 md12 l12">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Cadastro de Produto</span>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="referencia" type="text" value="" name="referencia" required autofocus
+                               maxlength="20"/>
+                        <label for="referencia">Referencia</label>   
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="descricao" type="text" value="" name="descricao" required
+                               maxlength="120"/>
+                        <label for="descricao">Descrição</label>   
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="preco" type="tel" value="" name="preco" required
+                               class="moeda"/>
+                        <label for="preco">Preço</label>   
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div class="row">
+                    <div class="col s12 m2 l2">
+                        <a id="salvar" class="btn btn-block" >Salvar</a>
+                    </div>
+                    <div class="col s12 m2 l2">
+                        <a onclick="irParaPagina('produtos')" class="btn btn-block">voltar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

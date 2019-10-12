@@ -1,0 +1,103 @@
+<script>
+    $(document).ready(function () {
+        M.AutoInit();
+        $(".datepicker").datepicker({
+            format: "dd/mm/yyyy"
+        });
+        var conta = localStorage.getItem("usuario");
+        $.ajax({
+            url: "http://" + document.domain + ":8090/product",
+            contentType: 'application/json',
+            type: 'GET',
+            dataType: 'json',
+            headers: {"X-TENANCY-ID": conta}
+        }).done(function (dados) {
+            var linhas = document.getElementById("linhas");
+            dados.forEach(dado => {
+                criarLinhasTabela(dado, linhas);
+            });
+        });
+        function criarLinhasTabela(dado, linhas) {
+            var tr = document.createElement("tr");
+            var tdReferencia = document.createElement("td");
+            var tdDescricao = document.createElement("td");
+            var tdQuantidade = document.createElement("td");
+
+            tdReferencia.textContent = dado.id;
+
+            tdDescricao.textContent = dado.name;
+
+            var inputQuantidade = document.createElement("input");
+            inputQuantidade.type = "number";
+            inputQuantidade.className = "quantidade";
+            inputQuantidade.value = 1;
+            inputQuantidade.style.textAlign = "center";
+
+            tdQuantidade.appendChild(inputQuantidade);
+            tdQuantidade.style.width = "200px";
+
+            tr.appendChild(tdReferencia);
+            tr.appendChild(tdDescricao);
+            tr.appendChild(tdQuantidade);
+
+            linhas.appendChild(tr);
+        }
+        $("#salvar").click(function () {
+            var document = $("#document").val();
+            var type = $("#type").val();
+            var date = $("#date").val();
+
+
+        });
+    });
+</script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Movement Stock</span>
+                <div class="row">
+                    <div class="input-field col s12 m4 l4">
+                        <input id="document" type="text" name="document" required autofocus
+                               maxlength="20"/>
+                        <label for="document">Document</label>   
+                    </div>
+                    <div class="input-field col s12 m4 l4">
+                        <select id="type" >
+                            <option value="" disabled selected>Selected type</option>
+                            <option value="E">Input</option>
+                            <option value="S">Output</option>
+                        </select>
+                        <label for="banco">Types</label> 
+                    </div>
+                    <div class="input-field col s12 m4 l4">
+                        <input type="text" class="datepicker" id="date" />
+                        <label for="date">Date</label>   
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linhas">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div class="row">
+                    <div class="col s12 m2 l2">
+                        <a id="salvar" class="btn btn-block" >Salvar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

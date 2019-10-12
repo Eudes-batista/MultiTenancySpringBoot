@@ -1,0 +1,71 @@
+<script>
+    $(document).ready(function () {
+        M.AutoInit();
+        var criarConteudoDaTabela = function (produtos) {
+            var tbody = document.getElementById("corpo");
+            produtos.forEach(produto => {
+                var tr = document.createElement("tr");
+
+                var tdCode = document.createElement("td");
+                var tdName = document.createElement("td");
+                var tdPrice = document.createElement("td");
+                var tdOpcoes = document.createElement("td");
+
+                tdPrice.className = "money";
+
+                tdCode.textContent = produto.id;
+                tdName.textContent = produto.name;
+                tdPrice.textContent = produto.price.toLocaleString('pt-br', {style: 'currency', currency: 'BRL'});
+
+                var linkAlterar = document.createElement("a");
+                linkAlterar.textContent = "Alterar";
+                linkAlterar.onclick = function () {
+                    irParaPagina('produto/edit/' + produto.id);
+                    localStorage.setItem("id", produto.id);
+                };
+                linkAlterar.className = "btn";
+                tdOpcoes.appendChild(linkAlterar);
+
+                tr.appendChild(tdCode);
+                tr.appendChild(tdName);
+                tr.appendChild(tdPrice);
+                tr.appendChild(tdOpcoes);
+
+                tbody.appendChild(tr);
+            });
+        };
+        var listarTodos = function () {
+            var usuario = localStorage.getItem('usuario');
+            console.log(usuario);
+            $.ajax({
+                url: "http://" + document.domain + ":8090/product",
+                contentType: "application/json",
+                dataType: 'JSON',
+                type: 'GET',
+                headers: {"X-TENANCY-ID": usuario}
+            }).done(function (dados) {
+                if (dados) {
+                    var produtos = dados;
+                    criarConteudoDaTabela(produtos);
+                }
+            });
+        };
+        listarTodos();
+    });
+
+</script> 
+<table class="z-depth-3">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th></th>
+        </tr> 
+    </thead>
+    <tbody id="corpo">
+
+    </tbody>
+</table>
+<div class="col s12 md2 l2"></div>
+<a onclick="irParaPagina('produto/novo')" class="btn">Novo Registro</a>

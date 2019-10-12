@@ -1,0 +1,80 @@
+<script>
+    $(document).ready(function () {
+        var tenancyID = localStorage.getItem("usuario");
+        M.AutoInit();
+        $('.moeda').mask('###.##0,00', {reverse: true});
+        $("#salvar").click(function () {
+            var referencia = $("#referencia").val();
+            var descricao = $("#descricao").val();
+            var preco = $("#preco").val();
+            var precoFormatado = preco.toString().replace(/\./, '').replace(/\,/, '.');
+            var product = {id: referencia, name: descricao, price: precoFormatado, currentInventory: 0};
+            $.ajax({
+                url: "http://" + document.domain + ":8090/product",
+                type: 'POST',
+                contentType: "application/json",
+                dataType: 'json',
+                headers: {'X-TENANCY-ID': tenancyID},
+                data: JSON.stringify(product)
+            }).done(function (dados) {
+                if (dados) {
+                    M.toast({html: 'Produto salvo com sucesso.', classes: ['rounded', 'posicao']});
+                }
+            });
+        });
+    });
+    var pesquisarProduto = function (input) {
+        if(!input.value) return;
+        $.ajax({
+            url: "https://api.cosmos.bluesoft.com.br/gtins/" + input.value + ".json",
+            dataType: 'json',
+            type: 'GET',
+            crossDomain: true,
+            contentType: 'application/json',
+            headers: {"X-Cosmos-Token": "1PBHjGipdOpCAUE4V912TQ"}
+        }).done(function (dados) {
+            console.log(dados);
+        });
+    };
+</script>
+<div class="row">
+    <div class="col s12 md12 l12">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">Cadastro de Produto</span>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="codigoBarra" type="number" name="codigoBarra" required autofocus
+                                onblur="pesquisarProduto(this)"/>
+                        <label for="codigoBarra">Codigo de Barras</label>   
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="referencia" type="text" name="referencia" required
+                               maxlength="20"/>
+                        <label for="referencia">Referencia</label>   
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="descricao" type="text" name="descricao" required
+                               maxlength="120"/>
+                        <label for="descricao">Descrição</label>   
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="preco" type="tel" name="preco" required
+                               class="moeda"/>
+                        <label for="preco">Preço</label>   
+                    </div>
+                </div>
+            </div>
+            <div class="card-action">
+                <div class="row">
+                    <div class="col s12 m2 l2">
+                        <a id="salvar" class="btn btn-block" >Salvar</a>
+                    </div>
+                    <div class="col s12 m2 l2">
+                        <a onclick="irParaPagina('produtos')" class="btn btn-block">voltar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
